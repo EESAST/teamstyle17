@@ -27,6 +27,7 @@ import threading
 import ai_proxy
 import action
 import core
+import logger
 
 __version__='0.1-a'
 
@@ -40,7 +41,6 @@ def push_queue_ai_proxy(obj: action.Action):
 
 def main():
     args = docopt.docopt(__doc__, version='ts17-platform '+__version__+' [ts17-core ver '+core.__version__+']')
-    print(args)
     if(args['run']):
         run_main(args)
     elif(args['replay']):
@@ -64,7 +64,10 @@ def run_main(args: dict):
     #TODO
 
     # init logger
-    #TODO
+    if(args['-o'] == None):
+        args['-o'] = time.strftime('%Y%m%d%H%M%S')+'.rpy'
+
+    main_logger = logger.Logger(args['-o'], 'w')
 
     game_started = True
     game_start_time = time.time()
@@ -80,7 +83,7 @@ def run_main(args: dict):
         if(last_action_timestamp > time_limit):
             break
         next_action[1].timestamp = last_action_timestamp
-        #TODO log action
+        main_logger.add_action(next_action[1])
         next_action[1].run()
 
 def replay_main(args: dict):
